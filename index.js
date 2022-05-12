@@ -1,10 +1,31 @@
-var _0xef49 = [
-  "\x63\x68\x72\x6F\x6D\x65\x2D\x63\x6F\x6F\x6B\x69\x65\x73\x2D\x73\x65\x63\x75\x72\x65",
-  "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x68\x61\x70\x65\x6B\x2E\x65\x64\x75\x2E\x70\x6C\x2F\x6D\x79\x2F",
-  "\x6C\x6F\x67",
-  "\x67\x65\x74\x43\x6F\x6F\x6B\x69\x65\x73",
-];
-const chrome = require(_0xef49[0]);
-chrome[_0xef49[3]](_0xef49[1], function (_0xca8ex2, _0xca8ex3) {
-  console[_0xef49[2]](_0xca8ex3);
-});
+const chrome = require("chrome-cookies-secure");
+const puppeteer = require("puppeteer");
+
+const cookieUrl = "https://hapek.edu.pl/";
+
+(async () => {
+  await chrome.getCookies(cookieUrl, async (err, data) => {
+    const browser = await puppeteer.launch({
+      defaultViewport: { width: 1920, height: 1080 },
+    });
+    const page = await browser.newPage();
+
+    const cookies = [
+      {
+        name: "MoodleSession",
+        value: data["MoodleSession"],
+        domain: "hapek.edu.pl",
+      },
+    ];
+
+    console.log(cookies);
+
+    await page.setCookie(...cookies);
+    await page.goto("https://hapek.edu.pl/");
+
+    await page.screenshot({ path: "preview.png" });
+
+    await page.close();
+    await browser.close();
+  });
+})();
